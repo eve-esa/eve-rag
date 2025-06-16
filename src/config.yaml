@@ -1,0 +1,13 @@
+database:
+  # Qdrant or other DB config
+  collection_name: "esa-nasa-workshop"
+
+embedding:
+  model_name: "nasa-impact/nasa-smd-ibm-st-v2"
+  normalize: true
+
+test_config:
+  dataset: "eve-esa/eve-is-open-ended" #"eve-esa/hardest-50-qna"
+  split: "train"
+  question_column: "question" # "question" for "eve-esa/eve-is-open-ended", "Question" for "eve-esa/hardest-50-qna"
+  answer_column: "answer" # "answer" for "eve-esa/eve-is-open-ended", "Answer" for "eve-esa/hardest-50-qna"
