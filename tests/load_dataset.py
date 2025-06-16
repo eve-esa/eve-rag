@@ -9,8 +9,8 @@ def load_dataset(name, split='train'):
             - qa_eve_open_ended
             - qa_hardest_50_qna
     """
-    qa_eve_open_ended = load_dataset(name, split='train')
-    return qa_eve_open_ended, qa_hardest_50_qna
+    qa = load_dataset(name, split=split)
+    return qa
 
 # Usage Example
 # qa = load_dataset('eve-esa/eve-is-open-ended')
