@@ -1,6 +1,6 @@
 from retriever import QdrantRetriever
 from utils import *
-from load_dataset import load_dataset
+from load_dataset import load_data
 from embedding import load_hf_embeddings
 import random
 import os
@@ -15,7 +15,7 @@ config = load_config("config.yaml")
 
 # Load dataset
 test_cfg = config["test_config"]
-dataset = load_dataset(test_cfg["dataset"],test_cfg["split"])
+dataset = load_data(test_cfg["dataset"],split=test_cfg["split"])
 
 
 # Load embedding model

@@ -1,6 +1,6 @@
 from datasets import load_dataset
 
-def load_dataset(name, split='train'):
+def load_data(name, split='train'):
     """
     Loads the EVE open-ended and hardest-50 Q&A datasets.
 
@@ -12,4 +12,4 @@ def load_dataset(name, split='train'):
     return qa
 
 # Usage Example
-# qa = load_dataset('eve-esa/eve-is-open-ended')
+# qa = load_data('eve-esa/eve-is-open-ended')
