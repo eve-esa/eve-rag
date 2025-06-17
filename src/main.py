@@ -11,7 +11,7 @@ load_dotenv()
 api_key = os.getenv("QDRANT_API_KEY")
 qdrant_url = os.getenv("QDRANT_URL")
 # Load config
-config = load_config("config.yaml")
+config = load_config("src/config.yaml")
 
 # Load dataset
 test_cfg = config["test_config"]
@@ -29,7 +29,7 @@ embedding_model = load_hf_embeddings(
 retriever = QdrantRetriever(
     embedding=embedding_model,
     api_key=api_key,  
-    qdrant_url=api_key,
+    qdrant_url=qdrant_url,
     collection_name=config["database"]["collection_name"],
     k=5
 )
