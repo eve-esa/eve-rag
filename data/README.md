@@ -51,6 +51,6 @@ python data/process_data.py
 ```
 ## Step 4: Upload the processed chunks to Qdrant
 ```bash
-python data/ulpoad_data_qdrant.py
+python data/ulpoad_chunks_qdrant.py
 ```
 
