@@ -19,7 +19,7 @@ git clone https://github.com/eve-rag.git
 Navigate into the project folder (replace `eve-rag` with the folder name if you changed it during cloning):
 ```bash
 cd 'eve-rag'
-pip install -r eve-rag/requirements.txt
+pip install -r requirements.txt
 ```
 
 # Usage
@@ -47,10 +47,10 @@ embedding:
 ## Step 3: Process the documents
 Note: Check the number of documents you want to process in config.yaml
 ```bash
-python eve-rag/data/process_data.py
+python data/process_data.py
 ```
 ## Step 4: Upload the processed chunks to Qdrant
 ```bash
-python eve-rag/data/ulpoad_data_qdrant.py
+python data/ulpoad_data_qdrant.py
 ```
 
