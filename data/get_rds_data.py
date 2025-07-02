@@ -37,7 +37,7 @@ def get_rds_metadata(DB_HOST=None, DB_PORT=None, DB_USER=None, DB_PASSWORD=None,
 
     # Slice to limit number of documents, if specified
     if num_of_docs is not None:
-        meta_data_rds = meta_data_rds[:num_of_docs+1]
+        meta_data_rds = meta_data_rds[:num_of_docs]
 
     conn.close()
     return meta_data_rds

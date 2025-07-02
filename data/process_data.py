@@ -4,8 +4,11 @@ from dotenv import load_dotenv
 import s3fs
 from process_chunks import process_and_write_documents
 from chunker import MarkdownTwoStepChunker
+from utils import *
 
-num_of_docs=10 # num of documents to process
+config = load_config("config.yaml")
+
+num_of_docs=config['upload_params']['num_of_docs'] # num of documents to process
 current_dir = os.getcwd()
 # Define output directory relative to current working directory
 output_dir = os.path.join(current_dir, "chunked_data")
@@ -34,4 +37,5 @@ process_and_write_documents(
     fs=fs,
     chunker=chunker,
     output_dir=output_dir
+    total_docs=num_of_docs
 )

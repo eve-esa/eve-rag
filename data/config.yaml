@@ -1,0 +1,12 @@
+upload_params:
+  num_of_docs : 10000
+  batch_size : 1000
+  vector_size : 768
+
+database:
+  # Qdrant or other DB config
+  collection_name: "esa-data-aug_2"
+
+embedding:
+  model_name: "nasa-impact/nasa-smd-ibm-st-v2"
+  normalize: true

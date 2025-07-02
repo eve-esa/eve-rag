@@ -11,3 +11,4 @@ test_config:
   split: "train"
   question_column: "question" # "question" for "eve-esa/eve-is-open-ended", "Question" for "eve-esa/hardest-50-qna"
   answer_column: "answer" # "answer" for "eve-esa/eve-is-open-ended", "Answer" for "eve-esa/hardest-50-qna"
+

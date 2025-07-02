@@ -32,7 +32,7 @@ def process_text(text):
     return text
 
 
-def process_and_write_documents(df, fs, chunker, output_dir):
+def process_and_write_documents(df, fs, chunker, output_dir,total_docs):
     """
     Fetched markdown documents from aws s3 , processes documents and writes all chunks to a single output file.
 
@@ -49,7 +49,7 @@ def process_and_write_documents(df, fs, chunker, output_dir):
     doc_count = 0
     records_written = 0
 
-    output_path = get_output_file_path(output_dir, "all")
+    output_path = get_output_file_path(output_dir, total_docs)
     output_file = None
 
     try:
