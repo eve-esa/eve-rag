@@ -71,6 +71,15 @@ def string_to_uint(s: str) -> int:
     return int.from_bytes(hash_bytes[:8], byteorder="big", signed=False)
 
 def get_existing_ids(client, collection_name):
+    #get existing ids so there are no duplicates"
+    """
+    args:
+    collection_name(string): name of collection in Qdrant
+    client: Qdrant client
+
+    return:
+    ids(list) : list of Ids of the existing points/chunks in Qdrant
+    """
     existing_ids = set()
     scroll_offset = None
 
@@ -91,6 +100,17 @@ def get_existing_ids(client, collection_name):
     return existing_ids
 
 def upload_batch(batch_ids, batch_chunks, batch_metadata, client, collection_name, embedder):
+    """ uploads batches of the chuncks to the Qdrant collection
+
+    args:
+    batch_ids(list): uniques ids of chunks
+    batch_chunks(list): list of chunks of text
+    batch_metadata(list): metadata assosiated to the chunks
+    client: Qdrant client
+    collection_name(string): name of collection in Qdrant
+    embedder: Embedding model to convert chunks to vector embeddings
+    
+    """
     try:
         batch_vectors = embedder.embed_documents(batch_chunks)
     except Exception as e:
