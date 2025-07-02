@@ -11,7 +11,7 @@ config = load_config("data/config.yaml")
 num_of_docs=config['upload_params']['num_of_docs'] # num of documents to process
 current_dir = os.getcwd()
 # Define output directory relative to current working directory
-output_dir = os.path.join(current_dir, "chunked_data")
+output_dir = os.path.join(current_dir, "data/chunked_data")
 # Load variables from .env into the environment
 load_dotenv()
 DB_HOST = os.getenv("DB_HOST")

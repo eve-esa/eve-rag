@@ -171,7 +171,7 @@ def read_chucks_from_json(file_path):
 
 def main():
     load_dotenv()
-    config = load_config("config.yaml")
+    config = load_config("data/config.yaml")
 
 
     batch_size = config['upload_params']['batch_size'] 
@@ -202,7 +202,7 @@ def main():
                         collection_name=collection_name, 
                         chunks=chunks,
                         metadata=metadata, 
-                        embedding_model=embedding_model,
+                        embedder=embedding_model,
                         batch_size=batch_size)
 
 

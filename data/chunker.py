@@ -1,7 +1,7 @@
 import dataclasses
 from pathlib import Path
 from typing import List, Optional
-
+import os
 import click
 import logging
 import time
@@ -16,7 +16,8 @@ logger = logging.getLogger(__name__)
 current_time = time.strftime("%Y_%m_%d_%H-%M-%S")
 
 # Add file and stream handlers to the logger
-logger.addHandler(logging.FileHandler(f"logs/chunk_document_{current_time}.log"))
+os.makedirs("data/logs/", exist_ok=True)
+logger.addHandler(logging.FileHandler(f"data/logs/chunk_document_{current_time}.log"))
 logger.addHandler(logging.StreamHandler())
 
 
