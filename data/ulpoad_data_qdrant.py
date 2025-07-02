@@ -8,6 +8,7 @@ import time
 import hashlib
 from tqdm import tqdm
 from dotenv import load_dotenv
+from src.utils import *
 
 
 def create_qdrant_collection(QDRANT_URL,QDRANT_API_KEY,collection_name:str,vector_size:int):

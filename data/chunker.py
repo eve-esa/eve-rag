@@ -114,7 +114,7 @@ class MarkdownTwoStepChunker:
         Returns:
             List of properly sized markdown chunks
         """
-        logger.info(f"Markdown splitting started")
+        #logger.info(f"Markdown splitting started")
         sections = self.markdown_splitter.split_text(markdown_text)
         return sections
 
@@ -246,7 +246,7 @@ class MarkdownTwoStepChunker:
         Returns:
             List of sections and subsections with word-based overlap
         """
-        logger.info(f"Markdown chunking started")
+        #logger.info(f"Markdown chunking started")
         sections = self._chunk_markdown(markdown_text)
 
         final_sections = []

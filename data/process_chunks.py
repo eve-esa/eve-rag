@@ -96,3 +96,5 @@ def process_and_write_documents(df, fs, chunker, output_dir,total_docs):
         if not records_written and os.path.exists(output_path):
             os.remove(output_path)
             print(f"Removed empty output file: {output_path}")
+        else:
+            print(f"Processed chunks are saved to {output_path}")
