@@ -30,7 +30,7 @@ cd 'eve-rag'
 ```
 
 ## Step 2: Review/Change parameters in config.yaml
-```bash
+```
 upload_params:
   num_of_docs : 10000 #documents to be processed
   batch_size : 100 # batch size for Qdrant data upload
