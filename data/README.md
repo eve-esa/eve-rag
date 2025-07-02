@@ -1,8 +1,13 @@
-# Process and upload raw data
-## This code processes the metadata from AWS RDS and Markdown Files from AWS S3
-## Creates a jsonl file by extracting chunks from md docs
-## Jsonl file has chunks and metadeta for each chunk
-## The chunks from the jsonl files are then uploaded to Qdrant database
+# Process raw data and upload to Qdrant
+This code:
+
+- Processes the metadata from AWS RDS
+- Reads Markdown files from AWS S3
+- Extracts chunks from the markdown documents
+- Creates a `.jsonl` file containing:
+  - Each chunk of content
+  - Associated metadata for each chunk
+- Uploads the chunks from the `.jsonl` file to a Qdrant vector database
 
 # Installation
 ## Step 1: Clone the repository
