@@ -5,12 +5,14 @@ import s3fs
 from process_chunks import process_and_write_documents
 from chunker import MarkdownTwoStepChunker
 
-num_of_docs=1 # num of documents to process
-output_dir = "/data/" # Output directory
+num_of_docs=10 # num of documents to process
+current_dir = os.getcwd()
+# Define output directory relative to current working directory
+output_dir = os.path.join(current_dir, "chunked_data")
 # Load variables from .env into the environment
-load_dotenv('.env')
+load_dotenv()
 DB_HOST = os.getenv("DB_HOST")
-DB_PORT = os.getenv("DB_PORT")
+DB_PORT = int(os.getenv("DB_PORT"))
 DB_USER = os.getenv("DB_USER")
 DB_NAME = os.getenv("DB_NAME")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
