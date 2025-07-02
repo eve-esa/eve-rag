@@ -200,7 +200,7 @@ def main():
     collection_name=config["database"]["collection_name"]
 
     current_dir = os.getcwd() 
-    output_dir = os.path.join(current_dir, "chunked_data")
+    output_dir = os.path.join(current_dir, "data/chunked_data")
     file_path = os.path.join(output_dir, f"{num_of_docs}_docs.jsonl")# path for the jsonl file of the chuncks
 
     QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
