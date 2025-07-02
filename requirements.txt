@@ -16,3 +16,5 @@ twisted
 tqdm
 pdf2bib
 pony
+pandas
+s3fs

@@ -1,7 +1,7 @@
 import pandas as pd
 import pymysql
 
-def get_rds_metadata(DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME, num_of_docs=None):
+def get_rds_metadata(DB_HOST=None, DB_PORT=None, DB_USER=None, DB_PASSWORD=None, DB_NAME=None, num_of_docs=None):
     """
     Connects to a MySQL RDS database and retrieves cleaned metadata from the 'metadata' table.
 

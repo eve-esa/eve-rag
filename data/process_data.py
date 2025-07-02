@@ -6,20 +6,22 @@ from process_chunks import process_and_write_documents
 from chunker import MarkdownTwoStepChunker
 
 num_of_docs=1 # num of documents to process
-output_dir = "/content/drive/MyDrive/data_augmentation/" # Output directory
+output_dir = "/data/" # Output directory
 # Load variables from .env into the environment
-load_dotenv()
+load_dotenv('.env')
 DB_HOST = os.getenv("DB_HOST")
 DB_PORT = os.getenv("DB_PORT")
 DB_USER = os.getenv("DB_USER")
 DB_NAME = os.getenv("DB_NAME")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
+
 meta_data=get_rds_metadata(DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME, num_of_docs=num_of_docs)
 
 # Setup S3 filesystem
 fs = s3fs.S3FileSystem()
 
 # chunker for markdown files
+os.makedirs("logs", exist_ok=True)
 chunker = MarkdownTwoStepChunker(max_chunk_size=1024, chunk_overlap=0,add_headers=False)
 
 
