@@ -1,6 +1,7 @@
 database:
   # Qdrant or other DB config
-  collection_name: "esa-nasa-workshop"
+  collection_name: "esa-data-aug_2"
+  top_k: 5 # number of chunks with highest matches
 
 embedding:
   model_name: "nasa-impact/nasa-smd-ibm-st-v2"
