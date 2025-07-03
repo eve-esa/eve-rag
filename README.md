@@ -43,19 +43,19 @@ Initialize and use the naive_RAG class in your Python script.
 from src.main import naive_RAG
 rag = naive_RAG()
 ```
-### Query
+##### Query
 ```bash
 docs = rag.query("What is the role of Earth in the Solar System?")
 ```
-### Query with year filter:
+##### Query with year filter:
 ```bash 
 docs = rag.query("What missions launched recently?", year=[2015, 2023])
 ```
-### Query with keyword filter (searches in title):
+##### Query with keyword filter (searches in title):
 ```bash
 docs = rag.query("Explain satellite imaging", keywords=["satellite", "remote sensing"])
 ```
-### Query with both year and keyword filters:
+##### Query with both year and keyword filters:
 ```bash
 docs = rag.query("Explain satellite imaging techniques",year=[2010, 2020],keywords=["satellite", "sensor"])
 ```
