@@ -1,11 +1,10 @@
 import os
 from typing import List, Optional
 from dotenv import load_dotenv
-from utils import load_config
-from embedding import load_hf_embeddings
-from retriever import QdrantRetriever
+from src.embedding import load_hf_embeddings
+from src.retriever import QdrantRetriever
 from langchain_core.documents import Document
-from utils import *
+from src.utils import *
 
 class naive_RAG:
     """
