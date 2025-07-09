@@ -86,7 +86,7 @@ class QdrantRetriever:
             print(f"Search failed: {e}")
             search_result = []
         end_time = time.time()
-        print(f'Search time : {(end_time-start_time)/1000} ms')
+        print(f'Search time : {(end_time-start_time)*1000} ms')
         docs = []
         for hit in search_result:
             payload = hit.payload or {}
