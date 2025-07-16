@@ -52,7 +52,7 @@ class naive_RAG:
             keywords=keywords
         )
         docs=format_docs(docs)
-        print(docs)
+        #print(docs)
         return docs
     
 
