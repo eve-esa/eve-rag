@@ -2,6 +2,10 @@ import os
 import json
 import pandas as pd
 from tqdm import tqdm
+from src.utils import *
+
+config = load_config("data/config.yaml")
+
 
 
 def get_output_file_path(output_dir, total_docs):
@@ -51,16 +55,18 @@ def process_and_write_documents(df, fs, chunker, output_dir,total_docs):
 
     output_path = get_output_file_path(output_dir, total_docs)
     output_file = None
+    bucket_path=config['S3_path']
 
     try:
         for _, row in tqdm(df.iterrows(), total=len(df), desc="Processing documents"):
 
             key = row['file_path']
-            s3_path = f's3://llm4eo-s3/raw_data_dedup_cleaned/{key}'
+            s3_path = os.path.join(bucket_path, key)
 
             try:
                 with fs.open(s3_path, 'r', encoding='utf-8') as s3_file:
-                    content = process_text(s3_file.read())
+                    content=s3_file.read()
+                    content = process_text(content)
                     chunks = chunker.chunk(content)
                     meta_data = row.to_dict()
 

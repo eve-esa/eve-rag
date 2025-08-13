@@ -35,12 +35,12 @@ def create_qdrant_collection(QDRANT_URL,QDRANT_API_KEY,collection_name:str,vecto
             collection_name=collection_name,
             hnsw_config=HnswConfigDiff(
                 on_disk=True, # saves indexing graph on disk
-                m=48 # keep it low if low memory available
+                m=0 # keep it low if low memory available (upload with zero for less load on cpu)
 
             ),
             optimizers_config=OptimizersConfigDiff(
-                indexing_threshold=100000,
-                memmap_threshold=50000, # should be lower than indexing_threshold when RAM is limited
+                indexing_threshold=10000,
+                memmap_threshold=5000, # should be lower than indexing_threshold when RAM is limited
                 deleted_threshold=0.1, 
             ),
         )
