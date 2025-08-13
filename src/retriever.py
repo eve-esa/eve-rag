@@ -4,10 +4,6 @@ from qdrant_client import QdrantClient
 from qdrant_client.http.models import Filter, FieldCondition, Range, MatchText
 import time
 
-from qdrant_client import QdrantClient
-from qdrant_client.http.models import Filter, FieldCondition, Range, MatchText
-import time
-from typing import List, Optional
 def get_filter(year: Optional[List[int]] = None, keywords: Optional[List[str]] = None) -> Optional[Filter]:
     """
     Create a Qdrant filter based on optional year range and list of keywords.
