@@ -1,23 +1,21 @@
 import dataclasses
 from pathlib import Path
 from typing import List, Optional
-import os
 import click
 import logging
 import time
 
 from langchain_core.documents import Document
 from langchain_text_splitters import MarkdownHeaderTextSplitter
-from custom_splitter import SentenceTextSplitter
+from chunker.custom_splitter import SentenceTextSplitter
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger(__name__)
 
 current_time = time.strftime("%Y_%m_%d_%H-%M-%S")
 
 # Add file and stream handlers to the logger
-os.makedirs("data/logs/", exist_ok=True)
-logger.addHandler(logging.FileHandler(f"data/logs/chunk_document_{current_time}.log"))
+#logger.addHandler(logging.FileHandler(f"logs/chunk_document_{current_time}.log"))
 logger.addHandler(logging.StreamHandler())
 
 
@@ -44,7 +42,7 @@ class MarkdownTwoStepChunker:
     """
 
     def __init__(self, max_chunk_size: int = 1800, chunk_overlap: int = 0, add_headers: bool = True,
-                 word_overlap: int = None):
+                 word_overlap: int = None, headers_to_split_on: List[int] = None, merge_small_chunks: bool = False):
         """
         Initialize the chunker with configuration parameters.
 
@@ -55,19 +53,14 @@ class MarkdownTwoStepChunker:
             word_overlap: Number of words to overlap between chunks (defaults to None,
                          will estimate from chunk_overlap if not specified)
         """
-        self.headers_to_split_on = [
-            ("#", 1),
-            ("##", 2),
-            ("###", 3),
-            ("####", 4),
-            ("#####", 5),
-            ("######", 6),
-        ]
+        if headers_to_split_on is None:
+            headers_to_split_on = [1, 2, 3, 4, 5, 6]
+        self.headers_to_split_on = [("#" * level, level) for level in headers_to_split_on]
         self.max_chunk_size = max_chunk_size
         self.overlap = chunk_overlap
         self.word_overlap = word_overlap
         self.markdown_splitter = MarkdownHeaderTextSplitter(
-            headers_to_split_on=self.headers_to_split_on, strip_headers=True
+            headers_to_split_on=self.headers_to_split_on, strip_headers=False
         )
         self.add_headers = add_headers
         # Use the custom splitter that preserves LaTeX and tables
@@ -75,6 +68,7 @@ class MarkdownTwoStepChunker:
             chunk_size=max_chunk_size,
             chunk_overlap=chunk_overlap
         )
+        self.merge_small_chunks = merge_small_chunks
 
     def _text_split(self, docs: list[Document]) -> List[Document]:
         """
@@ -102,7 +96,9 @@ class MarkdownTwoStepChunker:
         reverse_headers = headers.items()
         reverse_headers = sorted(reverse_headers, key=lambda x: x[0], reverse=True)
         for level, header in reverse_headers:
-            section.page_content = f"{'#' * level} {header}\n{section.page_content}"
+            header_str = f"{'#' * level} {header}"
+            if header_str not in section.page_content:
+                section.page_content = header_str + f"\n{section.page_content}"
         return section
 
     def _chunk_markdown(self, markdown_text: str) -> List[Document]:
@@ -115,7 +111,7 @@ class MarkdownTwoStepChunker:
         Returns:
             List of properly sized markdown chunks
         """
-        #logger.info(f"Markdown splitting started")
+        logger.info(f"Markdown splitting started")
         sections = self.markdown_splitter.split_text(markdown_text)
         return sections
 
@@ -166,20 +162,24 @@ class MarkdownTwoStepChunker:
 
                 # Check if we can merge based on heading levels and combined length
                 can_merge_headers = (
-                    # No headers in either chunk
-                        (current_lowest_level == float('inf') and next_lowest_level == float('inf')) or
+                        # No headers in either chunk
+                        (current_lowest_level == float('inf') or next_lowest_level == float('inf')) or
+                        # TODO - no header in one of the two
                         # Same level headers
                         (current_lowest_level == next_lowest_level) or
                         # Previous chunk has higher level header (lower number)
                         (current_lowest_level < next_lowest_level)
                 )
 
-                combined_length = len(current_chunk.page_content) + len(next_chunk.page_content)
+                combined_length = len(current_chunk.page_content.split()) + len(next_chunk.page_content.split())
 
                 if can_merge_headers and combined_length <= self.max_chunk_size:
+                    next_chunk_headers = ""
+                    for level_str, header in next_chunk.metadata.items():
+                        next_chunk_headers += f"{'#' * int(level_str)} {header}\n"
                     # Merge the chunks
                     current_chunk = Document(
-                        page_content=current_chunk.page_content + "\n\n" + next_chunk.page_content,
+                        page_content=current_chunk.page_content + "\n\n" + next_chunk_headers + "\n" + next_chunk.page_content,
                         metadata=current_chunk.metadata.copy()  # Keep the metadata of the first chunk
                     )
                     i += 1  # Move to the next chunk
@@ -247,7 +247,7 @@ class MarkdownTwoStepChunker:
         Returns:
             List of sections and subsections with word-based overlap
         """
-        #logger.info(f"Markdown chunking started")
+        logger.info(f"Markdown chunking started")
         sections = self._chunk_markdown(markdown_text)
 
         final_sections = []
@@ -263,7 +263,8 @@ class MarkdownTwoStepChunker:
                 final_sections.append(section)
 
         # Merge small chunks where possible
-        final_sections = self._merge_small_chunks(final_sections)
+        if self.merge_small_chunks:
+            final_sections = self._merge_small_chunks(final_sections)
 
         if self.add_headers:
             final_sections = [self._add_section_header(section) for section in final_sections]
@@ -279,38 +280,53 @@ class MarkdownTwoStepChunker:
         return final_sections
 
 
-@click.command()
-@click.option('--filepath', type=click.Path(exists=True), help='Path to the markdown file/ to process.')
-def main(filepath: Optional[str] = None):
+def print_on_file(chunks, output_file: Optional[Path] = None, filepath: Path = None):
+    # Save the chunks to a new file in the chunked_files directory
+    output_dir = Path("chunked_files")
+    output_dir.mkdir(exist_ok=True)
+    if output_file is None:
+        # Create a new file name with called "chunked_" + original file name
+        output_file = filepath.with_name(f"chunked_{filepath.name}")
+        output_file = output_dir / output_file.name
+    else:
+        output_file = Path(output_file)
+    with output_file.open('w', encoding='utf-8') as file:
+        for i, chunk in enumerate(chunks):
+            # Add a header for each chunk
+            file.write(f"Chunk {i + 1} len {len(chunk)}:\n")
+            file.write(chunk + "\n\n")
+            file.write("-" * 100 + "\n")
+            print(f"Wrote {len(chunk)} characters to {output_file}")
+    logger.info(f"Processed {len(chunks)} chunks and saved to {output_file}")
+
+
+def process_file(filepath: Optional[str] = None, headers_to_split_on: List[int] = None, max_chunk_size: int = 180000, merge_small_chunks: bool = False):
     filepath = Path(filepath)
 
     # Read the markdown file
     if not filepath.exists():
         logger.info(f"File {filepath} does not exist.")
         return
+
     with filepath.open('r', encoding='utf-8') as file:
         markdown_content = file.read()
-        print(f"Read {len(markdown_content)} characters from {filepath}")
+        logger.info(f"Read {len(markdown_content)} characters from {filepath}")
     # Initialize the chunker with a small max_chunk_size for demonstration purposes
-    chunker = MarkdownTwoStepChunker(max_chunk_size=1024, chunk_overlap=0)
+    chunker = MarkdownTwoStepChunker(max_chunk_size=max_chunk_size, chunk_overlap=0, add_headers=True, headers_to_split_on=headers_to_split_on, merge_small_chunks=merge_small_chunks)
 
     # Process the markdown
     chunks = chunker.chunk(markdown_content)
 
-    # Save the chunks to a new file in the chunked_files directory
-    output_dir = Path("../chunked_files")
-    output_dir.mkdir(exist_ok=True)
-    # Create a new file name with called "chunked_" + original file name
-    output_file = filepath.with_name(f"chunked_{filepath.name}")
-    output_file = output_dir / output_file.name
-    with output_file.open('w', encoding='utf-8') as file:
-        for i, chunk in enumerate(chunks):
-            # Add a header for each chunk
-            file.write(f"Chunk {i + 1} len {len(chunk)}:\n")
-            file.write(chunk + "\n\n")
-            file.write("-"*100 + "\n")
-            print(f"Wrote {len(chunk)} characters to {output_file}")
-    logger.info(f"Processed {len(chunks)} chunks and saved to {output_file}")
+    return chunks
+
+@click.command()
+@click.option('--filepath', type=click.Path(exists=True), help='Path to the markdown file/ to process.')
+@click.option('--output_file', type=click.Path(exists=False), help='Path to the output file.')
+def main(filepath: Optional[str] = None, output_file: Optional[Path] = None):
+    chunks = process_file(filepath, output_file)
+    print_on_file(chunks, output_file)
+
+
 
 
 def chunk_folder(folder_path: str):
@@ -327,7 +343,8 @@ def chunk_folder(folder_path: str):
 
     for file in folder.glob("*.md"):
         print(f"Processing file {file}")
-        main(file)
+        chunks = process_file(file)
+        print_on_file(chunks, file)
 
 if __name__ == "__main__":
- main()
+    chunk_folder('md_files')
