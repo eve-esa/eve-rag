@@ -1,9 +1,9 @@
-from get_rds_data import get_rds_metadata
+from .get_rds_data import get_rds_metadata
 import os
 from dotenv import load_dotenv
 import s3fs
-from process_chunks import process_and_write_documents
-from chunker import MarkdownTwoStepChunker
+from .process_chunks import process_and_write_documents
+from .chunker import MarkdownTwoStepChunker
 from src.utils import *
 import argparse
 
