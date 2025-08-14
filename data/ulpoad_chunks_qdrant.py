@@ -6,10 +6,10 @@ import os
 import json
 import time
 import hashlib
+import argparse
 from tqdm import tqdm
 from dotenv import load_dotenv
 from src.utils import *
-
 
 def create_qdrant_collection(QDRANT_URL,QDRANT_API_KEY,collection_name:str,vector_size:int):
     #Create a Qdrant collection if not already present.
@@ -26,8 +26,8 @@ def create_qdrant_collection(QDRANT_URL,QDRANT_API_KEY,collection_name:str,vecto
                 distance=Distance.COSINE,
                 on_disk=True,
             ),
-            shard_number=4,  # Increase shards for large data
-            replication_factor=1,
+            shard_number=8,  # Increase shards for large data
+            #replication_factor=1,
             on_disk_payload=True,
         )
 
@@ -39,9 +39,9 @@ def create_qdrant_collection(QDRANT_URL,QDRANT_API_KEY,collection_name:str,vecto
 
             ),
             optimizers_config=OptimizersConfigDiff(
-                indexing_threshold=10000,
-                memmap_threshold=5000, # should be lower than indexing_threshold when RAM is limited
-                deleted_threshold=0.1, 
+                indexing_threshold=0, # 0 for uploading changed later 
+                #memmap_threshold=5000, # should be lower than indexing_threshold when RAM is limited
+                #deleted_threshold=0.1, 
             ),
         )
         client.create_payload_index(
@@ -207,7 +207,7 @@ def main():
 
     batch_size = config['upload_params']['batch_size'] 
     vector_size = config['upload_params']['vector_size']
-    num_of_docs=config['upload_params']['num_of_docs']
+    #num_of_docs=config['upload_params']['num_of_docs']
     collection_name=config["database"]["collection_name"]
 
     file_path = os.path.abspath(args.file_path)

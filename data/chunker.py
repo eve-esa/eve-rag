@@ -7,7 +7,7 @@ import time
 
 from langchain_core.documents import Document
 from langchain_text_splitters import MarkdownHeaderTextSplitter
-from custom_splitter import SentenceTextSplitter
+from .custom_splitter import SentenceTextSplitter
 
 logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger(__name__)
