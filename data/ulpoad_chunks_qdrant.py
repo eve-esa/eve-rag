@@ -190,6 +190,17 @@ def read_chucks_from_json(file_path):
 
 
 def main():
+    parser = argparse.ArgumentParser(description="Upload chunked data to Qdrant")
+    parser.add_argument(
+        "--file-path",
+        type=str,
+        required=True,
+        help="path to chunked JSONL data"
+    )
+    args = parser.parse_args()
+
+
+
     load_dotenv()
     config = load_config("data/config.yaml")
 
@@ -199,9 +210,9 @@ def main():
     num_of_docs=config['upload_params']['num_of_docs']
     collection_name=config["database"]["collection_name"]
 
-    current_dir = os.getcwd() 
-    output_dir = os.path.join(current_dir, "data/chunked_data")
-    file_path = os.path.join(output_dir, f"{num_of_docs}_docs.jsonl")# path for the jsonl file of the chuncks
+    file_path = os.path.abspath(args.file_path)
+    if not os.path.isfile(file_path):
+        raise FileNotFoundError(f"File does not exist: {file_path}")
 
     QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
     QDRANT_URL = os.getenv("QDRANT_URL")
