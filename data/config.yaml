@@ -1,11 +1,11 @@
 upload_params:
   num_of_docs : 10000 #documents to be processed
-  batch_size : 100 # batch size for Qdrant data upload
+  batch_size : 1000 # batch size for Qdrant data upload
   vector_size : 768 # Qdrant vector size
 
 database:
   # Qdrant collection name
-  collection_name: "esa-data-aug_2"
+  collection_name: "esa-data-indus"
 
 embedding:
   model_name: "nasa-impact/nasa-smd-ibm-st-v2" # embedding model to be used for vectors 
