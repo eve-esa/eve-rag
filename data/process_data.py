@@ -26,7 +26,7 @@ def main(output_dir: str = None):
 
     # chunker for markdown files
     os.makedirs("logs", exist_ok=True)
-    chunker = MarkdownTwoStepChunker(max_chunk_size=1024, chunk_overlap=0,add_headers=False)
+    chunker = MarkdownTwoStepChunker(max_chunk_size=1800, chunk_overlap=0,add_headers=False)
 
 
 
