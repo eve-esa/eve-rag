@@ -1,7 +1,5 @@
 import dataclasses
-from pathlib import Path
-from typing import List, Optional
-import click
+from typing import List
 import logging
 import time
 
@@ -164,7 +162,6 @@ class MarkdownTwoStepChunker:
                 can_merge_headers = (
                         # No headers in either chunk
                         (current_lowest_level == float('inf') or next_lowest_level == float('inf')) or
-                        # TODO - no header in one of the two
                         # Same level headers
                         (current_lowest_level == next_lowest_level) or
                         # Previous chunk has higher level header (lower number)
@@ -233,6 +230,17 @@ class MarkdownTwoStepChunker:
             result.append(overlapped_chunk)
 
         return result
+    def set_max_chunk_size(self, max_chunk_size: int) -> None:
+        """
+        Set the maximum size of any chunk in characters.
+
+        Args:
+            max_chunk_size: Maximum size of any chunk in characters
+        """
+        self.max_chunk_size = max_chunk_size
+        self.text_splitter.chunk_size = max_chunk_size
+        logger.info(f"Max chunk size set to {max_chunk_size} characters")
+
 
     def chunk(self, markdown_text: str, overlap_words: int = None) -> List[str]:
         """
@@ -270,7 +278,7 @@ class MarkdownTwoStepChunker:
             final_sections = [self._add_section_header(section) for section in final_sections]
 
         # Convert Document objects to strings
-        final_sections = [section for section in final_sections]
+        final_sections = [section.page_content for section in final_sections]
 
 
 
@@ -278,73 +286,3 @@ class MarkdownTwoStepChunker:
         #final_sections = self._add_word_overlap(final_sections)
 
         return final_sections
-
-
-def print_on_file(chunks, output_file: Optional[Path] = None, filepath: Path = None):
-    # Save the chunks to a new file in the chunked_files directory
-    output_dir = Path("chunked_files")
-    output_dir.mkdir(exist_ok=True)
-    if output_file is None:
-        # Create a new file name with called "chunked_" + original file name
-        output_file = filepath.with_name(f"chunked_{filepath.name}")
-        output_file = output_dir / output_file.name
-    else:
-        output_file = Path(output_file)
-    with output_file.open('w', encoding='utf-8') as file:
-        for i, chunk in enumerate(chunks):
-            # Add a header for each chunk
-            file.write(f"Chunk {i + 1} len {len(chunk)}:\n")
-            file.write(chunk + "\n\n")
-            file.write("-" * 100 + "\n")
-            print(f"Wrote {len(chunk)} characters to {output_file}")
-    logger.info(f"Processed {len(chunks)} chunks and saved to {output_file}")
-
-
-def process_file(filepath: Optional[str] = None, headers_to_split_on: List[int] = None, max_chunk_size: int = 180000, merge_small_chunks: bool = False):
-    filepath = Path(filepath)
-
-    # Read the markdown file
-    if not filepath.exists():
-        logger.info(f"File {filepath} does not exist.")
-        return
-
-    with filepath.open('r', encoding='utf-8') as file:
-        markdown_content = file.read()
-        logger.info(f"Read {len(markdown_content)} characters from {filepath}")
-    # Initialize the chunker with a small max_chunk_size for demonstration purposes
-    chunker = MarkdownTwoStepChunker(max_chunk_size=max_chunk_size, chunk_overlap=0, add_headers=True, headers_to_split_on=headers_to_split_on, merge_small_chunks=merge_small_chunks)
-
-    # Process the markdown
-    chunks = chunker.chunk(markdown_content)
-
-    return chunks
-
-@click.command()
-@click.option('--filepath', type=click.Path(exists=True), help='Path to the markdown file/ to process.')
-@click.option('--output_file', type=click.Path(exists=False), help='Path to the output file.')
-def main(filepath: Optional[str] = None, output_file: Optional[Path] = None):
-    chunks = process_file(filepath, output_file)
-    print_on_file(chunks, output_file)
-
-
-
-
-def chunk_folder(folder_path: str):
-    """
-    Chunk all markdown files in a folder.
-
-    Args:
-        folder_path: Path to the folder containing markdown files
-    """
-    folder = Path(folder_path)
-    if not folder.exists() or not folder.is_dir():
-        logger.info(f"Folder {folder} does not exist.")
-        return
-
-    for file in folder.glob("*.md"):
-        print(f"Processing file {file}")
-        chunks = process_file(file)
-        print_on_file(chunks, file)
-
-if __name__ == "__main__":
-    chunk_folder('md_files')

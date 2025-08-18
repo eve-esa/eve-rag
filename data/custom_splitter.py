@@ -229,7 +229,7 @@ class SentenceTextSplitter(TextSplitter):
         current_size = 0
 
         for sentence in sentences:
-            sentence_size = len(sentence)
+            sentence_size = len(sentence.split())
 
             # If sentence itself exceeds chunk size, keep it as a single chunk
             if sentence_size > self.chunk_size:
@@ -265,7 +265,7 @@ class SentenceTextSplitter(TextSplitter):
                 current_chunk = chunks[i]
 
                 # Add the overlap from the previous chunk
-                overlap_text = prev_chunk[-self.chunk_overlap:] if len(prev_chunk) >= self.chunk_overlap else prev_chunk
+                overlap_text = prev_chunk[-self.chunk_overlap:] if len(prev_chunk.split()) >= self.chunk_overlap else prev_chunk
                 chunks_with_overlap.append(overlap_text + current_chunk)
 
             return chunks_with_overlap
