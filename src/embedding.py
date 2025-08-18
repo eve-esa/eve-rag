@@ -62,9 +62,10 @@ class qwen_embedder:
             truncation=truncation,
             max_length=max_length,
             normalize_embeddings=normalize,
-            convert_to_numpy=False,
+            convert_to_numpy=True,
             convert_to_tensor=False 
         )
+        embeddings = embeddings.tolist()
         return embeddings
 
 # Example usage:

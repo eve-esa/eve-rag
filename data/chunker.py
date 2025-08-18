@@ -278,7 +278,7 @@ class MarkdownTwoStepChunker:
             final_sections = [self._add_section_header(section) for section in final_sections]
 
         # Convert Document objects to strings
-        final_sections = [section.page_content for section in final_sections]
+        final_sections = [section for section in final_sections]
 
 
 

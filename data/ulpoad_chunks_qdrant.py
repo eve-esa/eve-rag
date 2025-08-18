@@ -113,6 +113,7 @@ def upload_batch(batch_ids, batch_chunks, batch_metadata, client, collection_nam
     """
     try:
         batch_vectors = embedder.embed_documents(batch_chunks)
+        
     except Exception as e:
         print(f"Embedding error: {e}")
         return
