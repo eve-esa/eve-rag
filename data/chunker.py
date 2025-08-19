@@ -171,12 +171,9 @@ class MarkdownTwoStepChunker:
                 combined_length = len(current_chunk.page_content.split()) + len(next_chunk.page_content.split())
 
                 if can_merge_headers and combined_length <= self.max_chunk_size:
-                    next_chunk_headers = ""
-                    for level_str, header in next_chunk.metadata.items():
-                        next_chunk_headers += f"{'#' * int(level_str)} {header}\n"
                     # Merge the chunks
                     current_chunk = Document(
-                        page_content=current_chunk.page_content + "\n\n"  + "\n" + next_chunk.page_content,
+                        page_content=current_chunk.page_content + "\n\n" + next_chunk.page_content,
                         metadata=current_chunk.metadata.copy()  # Keep the metadata of the first chunk
                     )
                     i += 1  # Move to the next chunk
