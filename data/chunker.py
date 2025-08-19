@@ -176,7 +176,7 @@ class MarkdownTwoStepChunker:
                         next_chunk_headers += f"{'#' * int(level_str)} {header}\n"
                     # Merge the chunks
                     current_chunk = Document(
-                        page_content=current_chunk.page_content + "\n\n" + next_chunk_headers + "\n" + next_chunk.page_content,
+                        page_content=current_chunk.page_content + "\n\n"  + "\n" + next_chunk.page_content,
                         metadata=current_chunk.metadata.copy()  # Keep the metadata of the first chunk
                     )
                     i += 1  # Move to the next chunk
@@ -242,7 +242,17 @@ class MarkdownTwoStepChunker:
         logger.info(f"Max chunk size set to {max_chunk_size} characters")
 
 
-    def chunk(self, markdown_text: str, overlap_words: int = None) -> List[str]:
+    def split(self, markdown_text: str) -> List[str]:
+        """
+        Same as `chunk` but returns a list of strings instead of Document objects.
+        :param markdown_text:
+        :return:
+        """
+
+        docs = self.chunk(markdown_text)
+        return [doc.page_content for doc in docs]
+
+    def chunk(self, markdown_text: str) -> List[Document]:
         """
         Chunk the markdown text into sections and subsections.
         Merges small chunks when appropriate and adds word-based overlap between chunks.
@@ -278,9 +288,7 @@ class MarkdownTwoStepChunker:
             final_sections = [self._add_section_header(section) for section in final_sections]
 
         # Convert Document objects to strings
-        final_sections = [section.page_content for section in final_sections]
-
-
+        #final_sections = [section.page_content for section in final_sections]
 
         # Add word-based overlap between chunks
         #final_sections = self._add_word_overlap(final_sections)
