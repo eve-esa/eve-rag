@@ -1,106 +1,75 @@
 import os
 import json
 import pandas as pd
-from tqdm import tqdm
 from src.utils import *
 
 config = load_config("data/config.yaml")
 
 
-
-def get_output_file_path(output_dir, total_docs):
-    """
-    Returns a fixed output file path.
-    """
-    return os.path.join(output_dir, f"{total_docs}_docs.jsonl")
-
-
 def save_skipped_files(skipped_files, output_dir):
-    """
-    Saves list of skipped files to a .txt file.
-    """
     if not skipped_files:
         return
-
     skipped_path = os.path.join(output_dir, "skipped_files.txt")
     with open(skipped_path, "w", encoding="utf-8") as f:
         for path in skipped_files:
             f.write(path + "\n")
 
-def process_text(text):
-    # Remove the starting and ending quotes
-    text = text.strip('""')
 
-    # Replace the escaped "\n" with actual newline characters
+def process_text(text):
+    text = text.strip('""')
     text = text.replace('\\n', '\n')
     return text
 
 
-def process_and_write_documents(df, fs, chunker, output_dir,total_docs):
+def process_and_write_documents(df, fs, chunker, output_path):
     """
-    Fetched markdown documents from aws s3 , processes documents and writes all chunks to a single output file.
+    Fetched markdown documents from AWS S3, processes documents, and writes all chunks to a single output file.
 
     Args:
         df (pd.DataFrame): DataFrame containing metadata and file paths.
-        fs (fsspec.AbstractFileSystem): File system for accessing data files.
-        chunker (Any): Object with `.chunk(text)` method.
-        output_dir (str): Directory to write output.
-        max_docs_to_process (int or None): Max number of documents to process. None means all.
+        fs (fsspec.AbstractFileSystem): File system for accessing S3 files.
+        chunker (Any): Object with a `.chunk(text)` method to split text into chunks.
+        output_path (str): Full path (including filename) to write the JSONL output.
+    
+    Returns:
+        dict: Summary of processing with keys:
+            - "output_file" (str): Path to the output file.
+            - "docs_processed" (int): Number of documents successfully processed.
+            - "records_written" (int): Number of chunk records written.
+            - "skipped_files" (list): List of file paths that were missing/skipped.
     """
-    os.makedirs(output_dir, exist_ok=True)
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
     skipped_files = []
     doc_count = 0
     records_written = 0
+    bucket_path = config['S3_path']
 
-    output_path = get_output_file_path(output_dir, total_docs)
-    output_file = None
-    bucket_path=config['S3_path']
-
-    try:
-        for _, row in tqdm(df.iterrows(), total=len(df), desc="Processing documents"):
-
+    with open(output_path, "w", encoding="utf-8") as f:
+        for _, row in df.iterrows():
             key = row['file_path']
             s3_path = os.path.join(bucket_path, key)
-
             try:
                 with fs.open(s3_path, 'r', encoding='utf-8') as s3_file:
-                    content=s3_file.read()
-                    content = process_text(content)
+                    content = process_text(s3_file.read())
                     chunks = chunker.chunk(content)
                     meta_data = row.to_dict()
-
-                    # Open file only if there's something to write
-                    if output_file is None:
-                        output_file = open(output_path, "w", encoding="utf-8")
-
                     for chunk in chunks:
-                        record = {
-                            "content": chunk.page_content,
-                            "metadata": {
-                                **meta_data,
-                                "header": chunk.metadata
-                            }
-                        }
-                        output_file.write(json.dumps(record) + "\n")
+                        record = {"content": chunk, "metadata": meta_data}
+                        f.write(json.dumps(record) + "\n")
                         records_written += 1
-
                 doc_count += 1
-
             except FileNotFoundError:
-                print(f"Skipping missing file: {s3_path}")
                 skipped_files.append(s3_path)
 
-    finally:
-        if output_file:
-            output_file.close()
+    if records_written == 0 and os.path.exists(output_path):
+        os.remove(output_path)
 
-        save_skipped_files(skipped_files, output_dir)
+    save_skipped_files(skipped_files, os.path.dirname(output_path))
 
-        print(f"\nFinished. Documents processed: {doc_count}, Records written: {records_written}")
-        print(f"Skipped files: {len(skipped_files)}")
-        if not records_written and os.path.exists(output_path):
-            os.remove(output_path)
-            print(f"Removed empty output file: {output_path}")
-        else:
-            print(f"Processed chunks are saved to {output_path}")
+    return {
+        "output_file": output_path,
+        "docs_processed": doc_count,
+        "records_written": records_written,
+        "skipped_files": skipped_files
+    }
