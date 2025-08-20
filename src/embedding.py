@@ -36,7 +36,15 @@ def load_hf_embeddings(model_name: str, normalize: bool = True):
 class qwen_embedder:
     def __init__(self, model_name="Qwen/Qwen3-Embedding-4B"):
         # Load the sentence-transformers model
-        self.model = SentenceTransformer(model_name)
+        #self.model = SentenceTransformer(model_name)
+        self.model = SentenceTransformer(
+                                    model_name,
+                                    model_kwargs={
+                                        "torch_dtype": "auto",       # important: will use float16/bfloat16 automatically
+                                        "device_map": "auto",
+                                    },
+                                    tokenizer_kwargs={"padding_side": "left"},
+                                )
 
     def embed_documents(self, texts, 
                         padding=True, 
