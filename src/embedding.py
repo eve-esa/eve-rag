@@ -11,7 +11,7 @@ from torch import Tensor
 # Suppress LangChain warnings
 logging.getLogger("langchain").setLevel(logging.ERROR)
 
-def load_hf_embeddings(model_name: str, normalize: bool = True, model_type: str):
+def load_hf_embeddings(model_name: str, model_type: str ='sentence',normalize: bool = True):
     """
     Loads a HuggingFaceEmbeddings model with optional normalization.
 
@@ -61,7 +61,7 @@ class qwen_embedder:
 
     def embed_documents(self, 
                         texts,
-                        batch_size=16, 
+                        batch_size=8, 
                         padding=True, 
                         truncation=True, 
                         max_length=2048, 
@@ -144,7 +144,7 @@ class QwenEmbedder:
         self.model=model
         self.max_length = max_length
 
-    def embed_documents(self, texts, batch_size=16, normalize=True):
+    def embed_documents(self, texts, batch_size=8, normalize=True):
         all_embeddings = []
 
         for i in range(0, len(texts), batch_size):
