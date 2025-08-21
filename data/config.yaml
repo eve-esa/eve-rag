@@ -1,16 +1,16 @@
 upload_params:
   num_of_docs : 100000 #documents to be processed
   batch_size : 1000 # batch size for Qdrant data upload
-  vector_size : 768 # Qdrant vector size   #2560 for qwen # 768 for indus
+  vector_size : 2560 # Qdrant vector size   #2560 for qwen # 768 for indus
 
 
 database:
   # Qdrant collection name
-  collection_name: "esa-data-indus"
+  collection_name: "esa-data-qwen"
 
 embedding:
-  #model_name: "Qwen/Qwen3-Embedding-4B"
-  model_name: "nasa-impact/nasa-smd-ibm-st-v2" # embedding model to be used for vectors 
+  model_name: "Qwen/Qwen3-Embedding-4B"
+  #model_name: "nasa-impact/nasa-smd-ibm-st-v2" # embedding model to be used for vectors 
   normalize: true
 
 S3_path: "s3://llm4eo-s3/oa-data-cleaned-spellchecked/"
