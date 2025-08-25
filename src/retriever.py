@@ -50,12 +50,12 @@ class QdrantRetriever:
 
     def __init__(self, embedding, api_key: str, qdrant_url: str,
                  collection_name: str = 'esa-data-aug_2', k: int = 3):
-        self._client = QdrantClient(url=qdrant_url, api_key=api_key)
+        self._client = QdrantClient(url=qdrant_url, api_key=api_key,timeout=30)
         self.embedding = embedding
         self.collection_name = collection_name
         self.k = k
 
-    def get_relevant_documents(self, query: str, year: List[int] = None, keywords: List[str] = None) -> List[Document]:
+    def get_relevant_documents(self, query: str, year: List[int] = None, keywords: List[str] = None,ret_time:bool=False) -> List[Document]:
         """
         Retrieves top-k relevant documents from Qdrant based on query and optional filters.
 
@@ -82,7 +82,7 @@ class QdrantRetriever:
             print(f"Search failed: {e}")
             search_result = []
         end_time = time.time()
-        print(f'Search time : {(end_time-start_time)*1000} ms')
+        retrival_time=(end_time-start_time)*1000
         docs = []
         for hit in search_result:
             payload = hit.payload or {}
@@ -91,13 +91,20 @@ class QdrantRetriever:
             metadata["score"] = hit.score
             docs.append(Document(page_content=content, metadata=metadata))
         
-        return docs
+        if ret_time:
+            print(f'Search time : {retrival_time} ms')
+            return docs,retrival_time
+        else:
+            return docs
 
 """
 retriever = QdrantRetriever(embedding, api_key, qdrant_url,collection_name,k)
 
 # No filters
 docs = retriever.get_relevant_documents("What is the role of Earth in the Solar System?")
+
+# retvial time
+docs = retriever.get_relevant_documents("What is the role of Earth in the Solar System?",ret_time=True)
 
 # Year filter only
 docs = retriever.get_relevant_documents("What is the role of Earth in the Solar System?", year=[2010, 2020])
