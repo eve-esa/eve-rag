@@ -1,5 +1,5 @@
-#from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
+#from langchain_huggingface import HuggingFaceEmbeddings
 from sentence_transformers import SentenceTransformer
 import numpy as np
 import logging
@@ -91,6 +91,15 @@ class qwen_embedder:
         )
         embeddings = embeddings.tolist()
         return embeddings
+    
+
+    def embed_query(self,query):
+            
+        embeddings = self.model.encode( query,prompt_name="query")
+
+        embeddings = embeddings.tolist()
+        return embeddings
+
 
 
 
