@@ -229,6 +229,7 @@ def main():
     embedding_cfg = config["embedding"]
     embedding_model = load_hf_embeddings(
         model_name=embedding_cfg["model_name"],
+        model_type=embedding_cfg['type']
         normalize=embedding_cfg.get("normalize", True)
     )
 
