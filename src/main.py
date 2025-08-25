@@ -34,7 +34,7 @@ class naive_RAG:
             k=config["database"]["top_k"]
         )
 
-    def query(self, question: str, year: Optional[List[int]] = None, keywords: Optional[List[str]] = None) -> str:
+    def query(self, question: str, year: Optional[List[int]] = None, keywords: Optional[List[str]] = None,ret_time:bool=False) -> str:
         """
         Query Qdrant for relevant documents.
 
@@ -46,14 +46,24 @@ class naive_RAG:
         Returns:
             List[dict]: List of documents as dictionaries with text and metadata.
         """
-        docs = self.retriever.get_relevant_documents(
-            query=question,
-            year=year,
-            keywords=keywords
-        )
-        docs=format_docs(docs)
-        #print(docs)
-        return docs
+        if ret_time:
+            docs,ret_time = self.retriever.get_relevant_documents(
+                query=question,
+                year=year,
+                keywords=keywords
+            )
+            docs=format_docs(docs)
+            #print(docs)
+            return docs
+        else:
+            docs = self.retriever.get_relevant_documents(
+                query=question,
+                year=year,
+                keywords=keywords
+            )
+            docs=format_docs(docs)
+            #print(docs)
+            return docs
     
 
 """
