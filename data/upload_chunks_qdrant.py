@@ -29,6 +29,11 @@ def create_qdrant_collection(QDRANT_URL,QDRANT_API_KEY,collection_name:str,vecto
             shard_number=8,  # Increase shards for large data
             #replication_factor=1,
             on_disk_payload=True,
+            quantization_config=models.BinaryQuantization(
+        binary=models.BinaryQuantizationConfig(
+            always_ram=False,
+        ),
+    ),
         )
 
         client.update_collection(
@@ -249,7 +254,7 @@ def main():
     embedding_cfg = config["embedding"]
     embedding_model = load_hf_embeddings(
         model_name=embedding_cfg["model_name"],
-        model_type=embedding_cfg['type']
+        model_type=embedding_cfg['type'],
         normalize=embedding_cfg.get("normalize", True)
     )
 
