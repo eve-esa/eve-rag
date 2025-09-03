@@ -10,7 +10,10 @@ database:
 
 embedding:
   model_name: "Qwen/Qwen3-Embedding-4B"
-  #model_name: "nasa-impact/nasa-smd-ibm-st-v2" # embedding model to be used for vectors 
+  #model_name: "nasa-impact/nasa-smd-ibm-st-v2" # embedding model to be used for vectors
+  type: 'sentence' # type senstence,vllm and transformer for qwen only
   normalize: true
 
 S3_path: "s3://llm4eo-s3/oa-data-cleaned-spellchecked/"
+
+cluster: "llm4eo"

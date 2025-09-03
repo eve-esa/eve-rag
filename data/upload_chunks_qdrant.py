@@ -33,17 +33,30 @@ def create_qdrant_collection(QDRANT_URL,QDRANT_API_KEY,collection_name:str,vecto
 
         client.update_collection(
             collection_name=collection_name,
-            hnsw_config=HnswConfigDiff(
-                on_disk=True, # saves indexing graph on disk
-                m=0 # keep it low if low memory available (upload with zero for less load on cpu)
+            hnsw_config=models.HnswConfigDiff(
+                m=16,
+                ef_construct=128,
+                full_scan_threshold=10_000,
+                max_indexing_threads=2,
+                on_disk=True
+            ),
 
-            ),
-            optimizers_config=OptimizersConfigDiff(
-                indexing_threshold=0, # 0 for uploading changed later 
-                #memmap_threshold=5000, # should be lower than indexing_threshold when RAM is limited
-                #deleted_threshold=0.1, 
-            ),
         )
+        client.update_collection(
+                collection_name=collection_name,
+                optimizers_config=models.OptimizersConfigDiff(
+                    indexing_threshold=20000,          # start indexing after 20k vectors per segment
+                    memmap_threshold=5000,             # smaller than indexing_threshold; helps with RAM limits
+                    deleted_threshold=0.2,             # when >20% deleted, trigger segment cleanup
+                    vacuum_min_vector_number=1000,     # minimum segment size for vacuuming
+                    default_segment_number=4,          # spread data across 4 segments instead of 2
+                    max_segment_size=10_000_000,       # keep segments smaller (avoid huge merges)
+                    max_optimization_threads=2,        # limit parallel merges (less memory/disk pressure)
+                ),
+            )
+        
+
+
         client.create_payload_index(
         collection_name=collection_name,
         field_name="title",
@@ -220,9 +233,16 @@ def main():
     file_path = os.path.abspath(args.file_path)
     if not os.path.isfile(file_path):
         raise FileNotFoundError(f"File does not exist: {file_path}")
+    
+    if config["cluster"]=='llm4eo':
+        print('cluster llm4eo loaded')
+        QDRANT_API_KEY = os.getenv("QDRANT_API_KEY_1")
+        QDRANT_URL = os.getenv("QDRANT_URL_1")
+    else:
+        print('cluster eve-collections loaded')
+        QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
+        QDRANT_URL = os.getenv("QDRANT_URL")
 
-    QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
-    QDRANT_URL = os.getenv("QDRANT_URL")
 
 
     # Load embedding model

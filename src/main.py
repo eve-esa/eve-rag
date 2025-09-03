@@ -50,7 +50,8 @@ class naive_RAG:
             docs,ret_time = self.retriever.get_relevant_documents(
                 query=question,
                 year=year,
-                keywords=keywords
+                keywords=keywords,
+                ret_time=ret_time
             )
             docs=format_docs(docs)
             #print(docs)
@@ -59,7 +60,8 @@ class naive_RAG:
             docs = self.retriever.get_relevant_documents(
                 query=question,
                 year=year,
-                keywords=keywords
+                keywords=keywords,
+                ret_time=ret_time
             )
             docs=format_docs(docs)
             #print(docs)
