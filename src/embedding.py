@@ -25,20 +25,28 @@ def load_hf_embeddings(model_name: str, model_type: str ='sentence',normalize: b
 
     if model_name=="nasa-impact/nasa-smd-ibm-st-v2":
         encode_kwargs = {"normalize_embeddings": normalize}
+        print('indus 512 loaded')
         return HuggingFaceEmbeddings(model_name=model_name, encode_kwargs=encode_kwargs)
-    
+        
     elif model_name=="Qwen/Qwen3-Embedding-4B":
+        print('qwen loaded')
         if model_type=='sentence':
             return qwen_embedder(model_name=model_name)
         elif model_type=='vllm':
             return QwenEmbedderVLLM(model_name=model_name)
         elif model_type=='transformer':
             return QwenEmbedder(model_name=model_name)
-        else: 
-            print('model type is not correct supported model types are |sentence|vllm|transformer|')
+        else:
+            raise ValueError('model type is not correct supported model types are |sentence|vllm|transformer|')
+        
+    elif  "indus-sde-st-v0.2" in model_name:
+        encode_kwargs = {"normalize_embeddings": normalize}
+        return HuggingFaceEmbeddings(model_name=model_name, encode_kwargs=encode_kwargs)
+
     
     else:
         print('Embedding model name is incorrect')
+        raise ValueError ('model name is incorrect')
 
 
 
@@ -54,17 +62,17 @@ class qwen_embedder:
                                         "device_map": "auto",
                                     },
                                     tokenizer_kwargs={"padding_side": "left",
-                                                      "max_length": 4096,
+                                                      "max_length": 2048,
                                                       "truncation": True                                                      
                                                       }
                                                       )
 
     def embed_documents(self, 
                         texts,
-                        batch_size=2, 
+                        batch_size=8, 
                         padding=True, 
                         truncation=True, 
-                        max_length=4096, 
+                        max_length=2048, 
                         normalize=True):
         """
         Encodes a list of texts into embeddings.
