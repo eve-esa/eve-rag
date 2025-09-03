@@ -54,17 +54,17 @@ class qwen_embedder:
                                         "device_map": "auto",
                                     },
                                     tokenizer_kwargs={"padding_side": "left",
-                                                      "max_length": 2048,
+                                                      "max_length": 4096,
                                                       "truncation": True                                                      
                                                       }
                                                       )
 
     def embed_documents(self, 
                         texts,
-                        batch_size=8, 
+                        batch_size=2, 
                         padding=True, 
                         truncation=True, 
-                        max_length=2048, 
+                        max_length=4096, 
                         normalize=True):
         """
         Encodes a list of texts into embeddings.
