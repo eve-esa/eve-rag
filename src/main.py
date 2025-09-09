@@ -14,9 +14,17 @@ class naive_RAG:
     def __init__(self, config_path: str = "src/config.yaml"):
         # Load environment and config
         load_dotenv()
-        api_key = os.getenv("QDRANT_API_KEY")
-        qdrant_url = os.getenv("QDRANT_URL")
+
         config = load_config(config_path)
+
+        if config["cluster"]=='llm4eo':
+            print('cluster llm4eo loaded')
+            QDRANT_API_KEY = os.getenv("QDRANT_API_KEY_1")
+            QDRANT_URL = os.getenv("QDRANT_URL_1")
+        else:
+            print('cluster eve-collections loaded')
+            QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
+            QDRANT_URL = os.getenv("QDRANT_URL")
 
         # Load embedding model once
         embedding_cfg = config["embedding"]
@@ -28,8 +36,8 @@ class naive_RAG:
         # Initialize Qdrant retriever once
         self.retriever = QdrantRetriever(
             embedding=embedding_model,
-            api_key=api_key,
-            qdrant_url=qdrant_url,
+            api_key=QDRANT_API_KEY,
+            qdrant_url=QDRANT_URL,
             collection_name=config["database"]["collection_name"],
             k=config["database"]["top_k"]
         )

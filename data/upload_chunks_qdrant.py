@@ -79,6 +79,24 @@ def create_qdrant_collection(QDRANT_URL,QDRANT_API_KEY,collection_name:str,vecto
             field_name="year",
             field_schema="integer"
         )
+        client.create_payload_index(
+            collection_name=collection_name,
+            field_name="n_citations",
+            field_schema="integer"
+        )
+        client.create_payload_index(
+            collection_name=collection_name,
+            field_name="journal",
+            field_schema=models.TextIndexParams(
+                type="text",
+                tokenizer=models.TokenizerType.WORD,
+                min_token_len=1,   
+                max_token_len=50,
+                lowercase=True,
+            )
+        )
+
+
 
 
 

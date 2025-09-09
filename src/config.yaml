@@ -5,8 +5,9 @@ database:
   top_k: 5 # number of chunks with highest matches
 
 embedding:
-  model_name: "Qwen/Qwen3-Embedding-4B"
+  #model_name: "Qwen/Qwen3-Embedding-4B"
   #model_name: "nasa-impact/nasa-smd-ibm-st-v2"
+  model_name: "Tulsikumar/indus-sde-st-v0.2"
   type: 'sentence' # type senstence,vllm and transformer for qwen only
   normalize: true
 
@@ -16,3 +17,4 @@ test_config:
   question_column: "question" # "question" for "eve-esa/eve-is-open-ended", "Question" for "eve-esa/hardest-50-qna"
   answer_column: "answer" # "answer" for "eve-esa/eve-is-open-ended", "Answer" for "eve-esa/hardest-50-qna"
 
+cluster: "llm4eo"

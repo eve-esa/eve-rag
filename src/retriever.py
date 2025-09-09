@@ -77,7 +77,15 @@ class QdrantRetriever:
                 query_vector=query_emb,
                 limit=self.k,
                 query_filter=query_filter
+                search_params=models.SearchParams(
+                quantization=models.QuantizationSearchParams(
+                                                            ignore=False,
+                                                            rescore=True,
+                                                            oversampling=2.0,
+                                                        )
             )
+            )
+            
         except Exception as e:
             print(f"Search failed: {e}")
             search_result = []

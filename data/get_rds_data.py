@@ -34,6 +34,10 @@ def get_rds_metadata(DB_HOST=None, DB_PORT=None, DB_USER=None, DB_PASSWORD=None,
         'created_at', 'updated_at', 'scraper', 'authors', 'volume', 'issue', 'page', 'month'
     ])
     meta_data_rds = meta_data_rds.dropna()
+    meta_data_rds.rename(columns={'citation_count': 'n_citations'}, inplace=True)
+
+    cols_to_convert = ['n_citations', 'reference_count', 'influential_citation_count']
+    meta_data_rds[cols_to_convert] = meta_data_rds[cols_to_convert].astype(int)
 
     # Slice to limit number of documents, if specified
     if num_of_docs is not None:
