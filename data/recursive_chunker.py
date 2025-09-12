@@ -24,13 +24,16 @@ class RecursiveMarkdownSplitter(TextSplitter):
     Recursive chunker that preserves Markdown and formatting.
     Splits at paragraphs -> sentences -> words without modifying original text.
     """
-    
+
 
     def __init__(self, chunk_size: int = 100, chunk_overlap: int = 0):
         super().__init__(keep_separator=True)
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
 
+    def split_text(self, text: str) -> List[str]:
+        return self._recursive_split(text)
+    
     def chunk(self, text: str) -> List[str]:
         return self._recursive_split(text)
 
