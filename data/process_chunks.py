@@ -55,12 +55,21 @@ def process_and_write_documents(df, fs, chunker, output_path):
                     chunks = chunker.chunk(content)
                     meta_data = row.to_dict()
                     for chunk in chunks:
-                        if chunk.metadata:
-                          header = [f"{'#' * key} {value}" for key, value in chunk.metadata.items()]
+                        # Handle string chunks
+                        if isinstance(chunk, str):
+                            chunk_text = chunk
+                            header = []
                         else:
-                          header =[]
-                        meta_data['header'] = header                      
-                        record = {"content": chunk.page_content, "metadata": meta_data}
+                            # Handle object chunks
+                            chunk_text = getattr(chunk, "page_content", str(chunk))
+                            metadata_obj = getattr(chunk, "metadata", {})
+                            if metadata_obj:
+                                header = [f"{'#' * key} {value}" for key, value in metadata_obj.items()]
+                            else:
+                                header = []
+
+                        meta_data['header'] = header
+                        record = {"content": chunk_text, "metadata": meta_data}
                         f.write(json.dumps(record) + "\n")
                         records_written += 1
                 doc_count += 1

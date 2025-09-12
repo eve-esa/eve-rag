@@ -1,8 +1,11 @@
 upload_params:
-  num_of_docs : 10000 #documents to be processed
   batch_size : 10000 # batch size for Qdrant data upload
   vector_size : 768 # Qdrant vector size   #2560 for qwen # 768 for indus
 
+
+chunk_params:
+  num_of_docs : 10000 #documents to be processed
+  chunker_type: 'recurcive' # recurcive or hierarchical
 
 database:
   # Qdrant collection name

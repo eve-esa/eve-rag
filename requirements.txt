@@ -1,6 +1,7 @@
 langchain-community
 langchain-huggingface
 sentence-transformers
+langchain
 qdrant-client>=1.9.2
 numpy==1.26
 PyYAML>=6.0
