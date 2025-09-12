@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import s3fs
 from .process_chunks import process_and_write_documents
 from .chunker import MarkdownTwoStepChunker
+from .recursive_chunker import RecursiveMarkdownSplitter
 from src.utils import *
 import argparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -22,7 +23,9 @@ def process_batch(batch_df, fs, chunker, output_dir, start_idx, end_idx):
 
 def main(output_dir: str, batch_size: int = 10, max_workers: int = 4):
     config = load_config("data/config.yaml")
-    num_of_docs=config['upload_params']['num_of_docs'] # num of documents to process
+    num_of_docs=config['chunk_params']['num_of_docs'] # num of documents to process
+    chunker_type=config['chunk_params']['chunker_type']
+
     # Load variables from .env into the environment
     load_dotenv()
     DB_HOST = os.getenv("DB_HOST")
@@ -35,8 +38,17 @@ def main(output_dir: str, batch_size: int = 10, max_workers: int = 4):
 
     fs = s3fs.S3FileSystem()
     os.makedirs(output_dir, exist_ok=True)
-    chunker = MarkdownTwoStepChunker(max_chunk_size=512, chunk_overlap=0,
+
+
+    if chunker_type=='hierarchical':
+        chunker = MarkdownTwoStepChunker(max_chunk_size=1024, chunk_overlap=0,
                                      add_headers=False, merge_small_chunks=True)
+    elif chunker_type=='recurcive':
+        chunker = RecursiveMarkdownSplitter(chunk_size=1024, chunk_overlap=0)
+    else:
+        raise ValueError(f"Unknown chunker_type: {chunker_type}. "
+                     f"Expected 'hierarchical' or 'recursive'.")
+        
 
     num_batches = math.ceil(len(meta_data) / batch_size)
     batches = [meta_data.iloc[i*batch_size:(i+1)*batch_size] for i in range(num_batches)]

@@ -4,7 +4,7 @@ upload_params:
 
 
 chunk_params:
-  num_of_docs : 10000 #documents to be processed
+  num_of_docs: 10000 #documents to be processed
   chunker_type: 'recurcive' # recurcive or hierarchical
 
 database:
