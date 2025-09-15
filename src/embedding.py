@@ -1,5 +1,5 @@
-from langchain_community.embeddings import HuggingFaceEmbeddings
-#from langchain_huggingface import HuggingFaceEmbeddings
+#from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from sentence_transformers import SentenceTransformer
 import numpy as np
 import logging
