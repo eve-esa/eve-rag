@@ -19,3 +19,4 @@ pony
 pandas
 s3fs
 accelerate
+sqlalchemy
