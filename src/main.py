@@ -4,6 +4,11 @@ from dotenv import load_dotenv
 from src.embedding import load_hf_embeddings
 from src.retriever import QdrantRetriever
 from langchain_core.documents import Document
+from langchain_core.messages import SystemMessage, HumanMessage
+from langchain_mistralai import ChatMistralAI
+from langchain.prompts import ChatPromptTemplate
+from operator import itemgetter
+from langchain_core.output_parsers import StrOutputParser
 from src.utils import *
 
 class naive_RAG:
@@ -42,6 +47,13 @@ class naive_RAG:
             k=config["database"]["top_k"]
         )
 
+        self.llm = ChatMistralAI(
+            model = "mistral-small-latest",
+            temperature = 0.1,
+            max_retries = 2,
+            max_tokens = 500,
+        )
+
     def query(self, question: str, year: Optional[List[int]] = None, keywords: Optional[List[str]] = None,ret_time:bool=False) -> str:
         """
         Query Qdrant for relevant documents.
@@ -75,14 +87,42 @@ class naive_RAG:
             #print(docs)
             return docs
     
+    def _decompose_query(self, question: str) -> List[str]:
+        """
+        decompose the main question into related sub-questions that can be answered.
+        """
+        from pydantic import BaseModel, Field
 
-"""
-Usage:
+        class Questions(BaseModel):
+            questions: List[str] = Field(
+                description="A list of sub-questions related to the input query."
+            )
+
+        system = """You are a helpful assistant that generates multiple sub-questions related to an input question. \n
+        The goal is to break down the input into a set of sub-problems / sub-questions that can be answers in isolation. \n
+        Generate multiple search queries related to: {question} \n
+        Output (3 queries):"""
+
+        structured_model = self.llm.with_structured_output(Questions)
+
+        questions = structured_model.invoke([SystemMessage(content=system)]+[HumanMessage(content=question)])
+        return questions.questions
+    
+    def query_decomposition(self, question: str) -> str:
+
+        questions = self._decompose_query(question)
+        rag_results = []
+    
+        for sub_question in questions:
+            retrieved_docs = self.query(sub_question)
+            
+            rag_results.append(retrieved_docs)
+        
+        return rag_results, questions
 
 rag=naive_RAG()
-docs=rag.query('question') # no filter
-docs=rag.query('question',year=[2020,2025]) # with year filter
-docs=rag.query('question',keywords=['keyword1','keyword2']) # with keywords for title
-docs=rag.query('question',year=[2020,2025],keywords=['keyword1','keyword2']) # with year and keyword
-
-"""
+docs=rag.query_decomposition('How does the shedding period duration at the end of the growing season compare between non-irrigated Populus fomentosa B301 versus full drip irrigation versus full furrow irrigation?') # no filter
+print(docs)
+# docs=rag.query('question',year=[2020,2025]) # with year filter
+# docs=rag.query('question',keywords=['keyword1','keyword2']) # with keywords for title
+# docs=rag.query('question',year=[2020,2025],keywords=['keyword1','keyword2']) # with year and keyword
