@@ -1,6 +1,6 @@
 from typing import List, Optional
 from langchain_core.documents import Document
-from qdrant_client import QdrantClient
+from qdrant_client import QdrantClient,models
 from qdrant_client.http.models import Filter, FieldCondition, Range, MatchText
 import time
 
@@ -76,7 +76,7 @@ class QdrantRetriever:
                 collection_name=self.collection_name,
                 query_vector=query_emb,
                 limit=self.k,
-                query_filter=query_filter
+                query_filter=query_filter,
                 search_params=models.SearchParams(
                 quantization=models.QuantizationSearchParams(
                                                             ignore=False,
