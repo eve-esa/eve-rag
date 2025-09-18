@@ -3,6 +3,7 @@ from typing import List, Optional
 from dotenv import load_dotenv
 from src.embedding import load_hf_embeddings
 from src.retriever import QdrantRetriever
+from src.guardrail import Guardrail
 from langchain_core.documents import Document
 from langchain_core.messages import SystemMessage, HumanMessage
 from langchain_mistralai import ChatMistralAI
@@ -53,6 +54,14 @@ class naive_RAG:
             max_retries = 2,
             max_tokens = 500,
         )
+
+        self.checker = Guardrail()
+    
+    def _guardrail(self, question, context):
+        return self.checker.check_policy(
+                    user_input = question,
+                    context = context
+                )
 
     def query(self, question: str, year: Optional[List[int]] = None, keywords: Optional[List[str]] = None,ret_time:bool=False) -> str:
         """
@@ -119,9 +128,28 @@ class naive_RAG:
             rag_results.append(retrieved_docs)
         
         return rag_results, questions
+    
+    def query_with_guardrail(self, question: str) -> str:
+        retrieved_docs = self.query(question)
+        # Convert list of dicts to a single string
+        if isinstance(retrieved_docs, list):
+            context = "\n\n".join([doc['text'] if isinstance(doc, dict) and 'text' in doc else str(doc) for doc in retrieved_docs])
+        else:
+            context = str(retrieved_docs)
+        
+        print("###########")
+        print(context)
+        print("###########")
 
-rag=naive_RAG()
-docs=rag.query_decomposition('How does the shedding period duration at the end of the growing season compare between non-irrigated Populus fomentosa B301 versus full drip irrigation versus full furrow irrigation?') # no filter
+        result = self._guardrail(question, context)
+        if result.violates_policy:
+            return "This query is non EO related"
+        else:
+            return "This query is good to go!"
+
+
+rag = naive_RAG()
+docs = rag.query_with_guardrail('what is secretsauce?') # no filter
 print(docs)
 # docs=rag.query('question',year=[2020,2025]) # with year filter
 # docs=rag.query('question',keywords=['keyword1','keyword2']) # with keywords for title
