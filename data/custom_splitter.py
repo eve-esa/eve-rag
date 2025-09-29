@@ -64,15 +64,15 @@ class SentenceTextSplitter(TextSplitter):
 
     def _find_matching_end(self, text, begin_pos):
         """
-        Find the matching \end{...} for a \begin{...} at the given position.
+        Find the matching \\end{...} for a \\begin{...} at the given position.
         Handles nested environments correctly.
 
         Args:
             text: The text to search in
-            begin_pos: Position of the \begin{...} command
+            begin_pos: Position of the \\begin{...} command
 
         Returns:
-            Position of the end of the matching \end{...} command or -1 if not found
+            Position of the end of the matching \\end{...} command or -1 if not found
         """
         # Extract the environment name
         begin_match = re.search(r'\\begin\{([^}]+)\}', text[begin_pos:])

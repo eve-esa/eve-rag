@@ -54,8 +54,8 @@ def create_qdrant_collection(QDRANT_URL,QDRANT_API_KEY,collection_name:str,vecto
                     memmap_threshold=5000,             # smaller than indexing_threshold; helps with RAM limits
                     deleted_threshold=0.2,             # when >20% deleted, trigger segment cleanup
                     vacuum_min_vector_number=1000,     # minimum segment size for vacuuming
-                    default_segment_number=4,          # spread data across 4 segments instead of 2
-                    max_segment_size=10_000_000,       # keep segments smaller (avoid huge merges)
+                    default_segment_number=2,          # spread data across 4 segments instead of 2
+                    max_segment_size=5_000_000,       # keep segments smaller (avoid huge merges)
                     max_optimization_threads=2,        # limit parallel merges (less memory/disk pressure)
                 ),
             )
