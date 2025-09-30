@@ -2,13 +2,13 @@ database:
   # Qdrant or other DB config
   collection_name: "esa-data-qwen"
   #collection_name: "esa-data-indus"
-  top_k: 5 # number of chunks with highest matches
+  top_k: 10 # number of chunks with highest matches
 
 embedding:
-  #model_name: "Qwen/Qwen3-Embedding-4B"
+  model_name: "Qwen/Qwen3-Embedding-4B"
   #model_name: "nasa-impact/nasa-smd-ibm-st-v2"
-  model_name: "Tulsikumar/indus-sde-st-v0.2"
-  type: 'sentence' # type senstence,vllm and transformer for qwen only
+  #model_name: "Tulsikumar/indus-sde-st-v0.2"
+  type: 'sentence' # type sentence,vllm and transformer for qwen only
   normalize: true
 
 test_config:

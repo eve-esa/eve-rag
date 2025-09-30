@@ -5,6 +5,9 @@ import numpy as np
 import logging
 import torch
 from torch import Tensor
+import torch.nn.functional as F
+from transformers import AutoTokenizer, AutoModel
+
 #import vllm
 #from vllm import LLM
 
@@ -90,9 +93,9 @@ class qwen_embedder:
         embeddings = self.model.encode(
             texts,
             batch_size=batch_size, 
-            padding=padding,
-            truncation=truncation,
-            max_length=max_length,
+       #     padding=padding,
+       #     truncation=truncation,
+       #     max_length=max_length,
             normalize_embeddings=normalize,
             convert_to_numpy=True,
             convert_to_tensor=False 
