@@ -108,6 +108,7 @@ Evaluates RAG system performance using Q&A datasets with ground truth:
 
 This project is supported by the European Space Agency (ESA) Φ-lab through the Large Language Model for Earth Observation and Earth Science project, as part of the Foresight Element within FutureEO Block 4 programme.
 
+## Citation
 
 If you use this project in academic or research settings, please cite:
 
