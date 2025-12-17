@@ -1,0 +1,105 @@
+# ============================================================================
+# Q&A Dataset Generation Configuration Template
+# ============================================================================
+# This is an example configuration file for the Q&A dataset generation script.
+# Copy this file and fill in your actual values.
+#
+# Usage:
+#   1. Copy this file: cp qa_generation_template.yaml my_config.yaml
+#   2. Fill in your API keys and paths
+#   3. Run: python ../generate_qa_dataset.py --config my_config.yaml
+# ============================================================================
+
+# ============================================================================
+# MODEL CONFIGURATION
+# ============================================================================
+model:
+  provider: "openai"
+
+  # Model name to use for Q&A generation
+  # Examples: "gpt-4o-mini", "gpt-4", "gpt-3.5-turbo"
+  name: "gpt-4o-mini"
+
+  # OPTION 1: Use environment variables (recommended for security)
+  # Uncomment these lines and comment out the direct credentials below
+  # api_key_env: "OPENAI_API_KEY"
+  # base_url_env: "OPENAI_BASE_URL"
+
+  # OPTION 2: Put credentials directly (simpler, but less secure)
+  # Replace with your actual API key
+  api_key: "your-openai-api-key-here"
+  base_url: "https://api.openai.com/v1"
+
+  # Generation parameters
+  max_tokens: 1500
+  temperature: 0.1
+
+# ============================================================================
+# INPUT DATA
+# ============================================================================
+input:
+  # Path to JSONL file containing full documents
+  # Each line should be: {"content": "...", "metadata": {"file_path": "..."}}
+  documents_jsonl: "../notebooks/documents.jsonl"
+
+  # Number of documents to sample for Q&A generation
+  num_samples: 10
+
+  # Random seed for reproducibility (optional, set to null for random)
+  random_seed: 42
+
+# ============================================================================
+# QDRANT CONFIGURATION
+# ============================================================================
+qdrant:
+  # OPTION 1: Use environment variables (recommended for security)
+  # Uncomment these lines and comment out the direct credentials below
+  # url_env: "QDRANT_URL"
+  # api_key_env: "QDRANT_API_KEY"
+
+  # OPTION 2: Put credentials directly (simpler, but less secure)
+  # Replace with your actual Qdrant URL and API key
+  url: "https://your-cluster.aws.cloud.qdrant.io"
+  api_key: "your-qdrant-api-key-here"
+
+  # Collection name in Qdrant
+  collection_name: "your_collection_name"
+
+  # Field names in the Qdrant payload
+  file_path_field: "file_path"
+  content_field: "content"
+
+# ============================================================================
+# VALIDATION
+# ============================================================================
+validation:
+  # Fuzzy matching threshold for reference validation
+  # 0.8 means 80% of tokens must match
+  fuzzy_threshold: 0.8
+
+  # Skip Q&A pairs with no valid references
+  skip_invalid: true
+
+# ============================================================================
+# OUTPUT
+# ============================================================================
+output:
+  # Path to save the generated Q&A dataset
+  output_file: "../data/qa_evaluation_dataset.json"
+
+  # Whether to overwrite existing file
+  overwrite: false
+
+  # Save intermediate results (in case of interruption)
+  save_progress: true
+  progress_file: "../data/qa_generation_progress.json"
+
+# ============================================================================
+# LOGGING
+# ============================================================================
+logging:
+  # Logging level: "DEBUG", "INFO", "WARNING", "ERROR"
+  level: "INFO"
+
+  # Log file path (set to null for console only)
+  log_file: "../data/qa_generation.log"

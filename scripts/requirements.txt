@@ -1,0 +1,16 @@
+# Requirements for Q&A Dataset Generation Script
+
+# YAML configuration
+pyyaml>=6.0
+
+# Environment variables
+python-dotenv>=1.0.0
+
+# LLM API client
+openai>=1.0.0
+
+# Vector database client
+qdrant-client>=1.7.0
+
+# Progress bars
+tqdm>=4.65.0
