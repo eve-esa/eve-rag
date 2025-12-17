@@ -1,0 +1,13 @@
+# Configuration file for updating Qdrant payload fields
+
+# Qdrant connection details
+qdrant_url: "<qdrant-url>"
+qdrant_api_key: "<qdrant-api-key>"
+
+# Collection to update
+collection_name:
+
+# Path to JSONL file containing updates
+# Each line should have 'file_path' field and fields to update
+jsonl_path: "data/new_data.jsonl"
+mapping_path: "data/mapping.json"
