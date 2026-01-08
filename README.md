@@ -4,6 +4,14 @@ This repository contains code and experiments for a Retrieval-Augmented Generati
 Specifically you will find a notebook section demonstrating the different components of the RAG pipeline that has been built for EVE.
 You will also find a scripts section with some utility scripts that covers some time-bound operations if you want to run them outside a notebook environment.
 
+## Earth Virtual Expert (EVE)
+
+**Earth Virtual Expert (EVE)** aims to advance the use of Large Language Models (LLMs) within the Earth Observation (EO) and Earth Science (ES) community.
+
+- Website: https://eve.philab.esa.int/  
+- HuggingFace: https://huggingface.co/eve-esa
+- Other repositories: https://github.com/eve-esa
+  
 ## Notebooks
 
 The notebooks provide an interactive walkthrough of the complete RAG pipeline, from data preparation to advanced optimization techniques:
